@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { hash } from 'bcrypt';
 import * as z from 'zod';
+import { error } from 'console';
 
 const UserSchema = z.object({
     username: z.string().min(5, {
@@ -23,11 +24,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 where: { username: username }
             })
             if (usernameExist) {
+                // TODO : standardize handling API response
                 res.status(409).json({ user: null, message: "Username already exists." })
             }
 
-            const encryptedPassword = await hash(password, 10)
+            const saltOrRounds = process.env.SALT_ROUND as string | number;
 
+            const encryptedPassword = await hash(password, Number(saltOrRounds));
             const newUser = await prisma.user.create({
                 data: {
                     username,

@@ -5,7 +5,7 @@ export default function Home() {
 
 
     <h1 className='text-4xl;'>
-      This is dallas-inventory-system repo!
+      This is cabbage-inventory repo!
     </h1>
 
 

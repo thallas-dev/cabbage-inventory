@@ -42,6 +42,7 @@ export default function Signup() {
             headers: {
                 'Content-Type': 'application/json'
             },
+            // TODO : standardize handling API call
             body: JSON.stringify({
                 username: data.username,
                 name: data.name,

@@ -28,9 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 res.status(409).json({ user: null, message: "Username already exists." })
             }
 
-            const saltOrRounds = process.env.SALT_ROUND as string | number;
-
-            const encryptedPassword = await hash(password, Number(saltOrRounds));
+            const encryptedPassword = await hash(password, Number(process.env.SALT_ROUND));
             const newUser = await prisma.user.create({
                 data: {
                     username,

@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import AppTitle from "@/components/ui/app-title";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -45,8 +45,12 @@ export default function Login() {
 
   return (
     <Form {...form}>
-      <section>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+      <section className="w-1/2 mx-auto">
+        <AppTitle />
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full  grid gap-y-3"
+        >
           <div></div>
           <FormField
             control={form.control}

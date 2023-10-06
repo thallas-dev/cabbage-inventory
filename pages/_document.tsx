@@ -7,7 +7,7 @@ export default function Document() {
       <Head />
       <body>
         <Nav />
-        <main className="h-screen w-screen pt-20 px-5">
+        <main className="h-screen w-screen pt-20 px-5 pb-5">
           <Main />
           <NextScript />
         </main>

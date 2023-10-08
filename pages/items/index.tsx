@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Badge } from "../../components/ui/badge";
 
 type Category = {
@@ -20,6 +22,13 @@ type Item = {
 };
 
 export default function Items() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  useEffect(() => {
+    if (session === null) {
+      router.push("/login");
+    }
+  }, [session, router]);
   const [categoriesList, setCategoriesList] = useState<Category[]>(
     Array(15)
       .fill({
@@ -27,7 +36,7 @@ export default function Items() {
         selected: false,
         qty: 0,
       })
-      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i }))
+      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i })),
   );
   const itemsList: Item[] = Array<Item>(50)
     .fill({
@@ -56,14 +65,14 @@ export default function Items() {
         ? [...itemsList]
         : itemsList
             .filter((item) =>
-              selectedCategories.some((cat) => item.qty <= cat.qty)
+              selectedCategories.some((cat) => item.qty <= cat.qty),
             )
             .sort((a, b) => {
               if (a.qty === 0) return 2;
               if (a.qty > b.qty) return 1;
               if (a.qty < b.qty) return -1;
               return 0;
-            })
+            }),
     );
 
     console.log({ filteredItemsList });

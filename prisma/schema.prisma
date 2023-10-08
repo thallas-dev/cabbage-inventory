@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   username  String   @unique
   name      String
   password  String
@@ -21,12 +21,12 @@ model User {
 }
 
 model Item {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   productName String   @db.VarChar(255)
   quantity    Int
   description String   @db.VarChar(255)
   owner       User     @relation(fields: [ownerId], references: [id])
-  ownerId     Int
+  ownerId     String
 }

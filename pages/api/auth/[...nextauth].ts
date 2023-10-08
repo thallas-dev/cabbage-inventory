@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { compare } from 'bcrypt';
-import NextAuth, { NextAuthOptions } from "next-auth";
+import { compare } from "bcrypt";
+import NextAuth, { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: NextAuthOptions = {
@@ -26,24 +26,26 @@ export const authOptions: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<User | null> {
         if (!credentials?.username || !credentials?.password) {
           return null;
         }
 
         const existingUser = await prisma.user.findUnique({
-          where: { username: credentials?.username }
+          where: { username: credentials?.username },
         });
 
-        if (!existingUser || !(await compare(credentials.password, existingUser.password))) {
+        if (
+          !existingUser ||
+          !(await compare(credentials.password, existingUser.password))
+        ) {
           return null;
         }
 
-
         return {
-          id: existingUser.id,
-          username: existingUser.username
-        }
+          id: String(existingUser.id),
+          username: existingUser.username,
+        };
       },
     }),
   ],
@@ -52,22 +54,21 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         return {
           ...token,
-          username: user.username
-        }
+          username: user.username,
+        };
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
       return {
         ...session,
         user: {
           ...session.user,
-          username: token.username
-        }
-      }
-    }
-  }
-}
+          username: token.username,
+        },
+      };
+    },
+  },
+};
 
 export default NextAuth(authOptions);
-

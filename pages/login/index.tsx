@@ -17,9 +17,9 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import AppTitle from "@/components/ui/app-title";
-import { SignInResponse, signIn } from 'next-auth/react'
+import { SignInResponse, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { BaseSyntheticEvent, SyntheticEvent } from 'react';
+import { BaseSyntheticEvent, SyntheticEvent } from "react";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -35,19 +35,17 @@ export default function Login() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const signInData = await signIn('credentials', {
+    const signInData = await signIn("credentials", {
       username: data.username,
       password: data.password,
-      redirect: false
+      redirect: false,
     });
 
     if (signInData?.ok) {
-      router.push("/items")
-    }
-    else {
+      router.push("/items");
+    } else {
       console.log("Something went wrong.");
     }
-
   }
 
   return (

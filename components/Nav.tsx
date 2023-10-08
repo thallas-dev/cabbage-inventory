@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { signOut, useSession } from 'next-auth/react';
+import { signOut, useSession } from "next-auth/react";
 
 const Nav = () => {
   const { data: session } = useSession();
@@ -11,16 +11,22 @@ const Nav = () => {
         <Link href="/">Logo</Link>
 
         {session?.user ? (
-          <Button onClick={() => signOut({
-            redirect: true,
-            callbackUrl: `${window.location.origin}/login`
-          })} variant='destructive'>
+          <Button
+            onClick={() =>
+              signOut({
+                redirect: true,
+                callbackUrl: `${window.location.origin}/login`,
+              })
+            }
+            variant="destructive"
+          >
             Logout
           </Button>
         ) : (
           <Button>
             <Link href="/login">Login</Link>
-          </Button>)}
+          </Button>
+        )}
       </div>
     </div>
   );

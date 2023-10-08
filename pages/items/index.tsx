@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Badge } from "../../components/ui/badge";
 
 type Category = {
@@ -26,9 +26,9 @@ export default function Items() {
   const { data: session } = useSession();
   useEffect(() => {
     if (session === null) {
-      router.push('/login')
+      router.push("/login");
     }
-  }, [session, router])
+  }, [session, router]);
   const [categoriesList, setCategoriesList] = useState<Category[]>(
     Array(15)
       .fill({
@@ -36,7 +36,7 @@ export default function Items() {
         selected: false,
         qty: 0,
       })
-      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i }))
+      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i })),
   );
   const itemsList: Item[] = Array<Item>(50)
     .fill({
@@ -64,15 +64,15 @@ export default function Items() {
       selectedCategories.length === 0
         ? [...itemsList]
         : itemsList
-          .filter((item) =>
-            selectedCategories.some((cat) => item.qty <= cat.qty)
-          )
-          .sort((a, b) => {
-            if (a.qty === 0) return 2;
-            if (a.qty > b.qty) return 1;
-            if (a.qty < b.qty) return -1;
-            return 0;
-          })
+            .filter((item) =>
+              selectedCategories.some((cat) => item.qty <= cat.qty),
+            )
+            .sort((a, b) => {
+              if (a.qty === 0) return 2;
+              if (a.qty > b.qty) return 1;
+              if (a.qty < b.qty) return -1;
+              return 0;
+            }),
     );
 
     console.log({ filteredItemsList });
@@ -122,8 +122,9 @@ export default function Items() {
                       </span>
                     ) : (
                       <span
-                        className={`ml-2 ${item.qty > 5 ? "text-slate-600" : "text-red-500"
-                          } text-xs`}
+                        className={`ml-2 ${
+                          item.qty > 5 ? "text-slate-600" : "text-red-500"
+                        } text-xs`}
                       >
                         {item.qty}
                         {item.unit}

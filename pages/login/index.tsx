@@ -17,6 +17,9 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import AppTitle from "@/components/ui/app-title";
+import { SignInResponse, signIn } from 'next-auth/react'
+import { useRouter } from "next/navigation";
+import { BaseSyntheticEvent, SyntheticEvent } from 'react';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -26,21 +29,25 @@ const FormSchema = z.object({
 });
 
 export default function Login() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const signInData = await signIn('credentials', {
+      username: data.username,
+      password: data.password,
+      redirect: false
     });
 
-    console.log(data);
+    if (signInData?.ok) {
+      router.push("/items")
+    }
+    else {
+      console.log("Something went wrong.");
+    }
+
   }
 
   return (

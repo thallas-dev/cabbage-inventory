@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 type Category = {
   name: string;
@@ -17,6 +19,13 @@ type Item = {
 };
 
 export default function Items() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  useEffect(() => {
+    if (session === null) {
+      router.push('/login')
+    }
+  }, [session, router])
   const [categoriesList, setCategoriesList] = useState<Category[]>(
     Array(5)
       .fill({
@@ -76,9 +85,8 @@ export default function Items() {
               <h5 className="px-2 mt-2">
                 {item.name}
                 <span
-                  className={`ml-2 ${
-                    item.qty > 5 ? "text-slate-600" : "text-red-500"
-                  } text-xs`}
+                  className={`ml-2 ${item.qty > 5 ? "text-slate-600" : "text-red-500"
+                    } text-xs`}
                 >
                   {item.qty}
                   {item.unit}

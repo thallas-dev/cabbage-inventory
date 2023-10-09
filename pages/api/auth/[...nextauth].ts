@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { compare } from "bcrypt";
 import NextAuth, { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { signOut } from 'next-auth/react';
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -50,19 +51,30 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account) {
-        token.id = user.id;
-      }
-      if (user) {
-        return {
-          ...token,
-          username: user.username,
-        };
-      }
-      return token;
-    },
+      async jwt({ token, user, account }) {
+        if (account) {
+          token.id = user.id;
+        }
+        if (user) {
+          return {
+            ...token,
+            username: user.username,
+          };
+        }
+        return token;
+      },
     async session({ session, token }) {
+      const existingUser = await prisma.user.findUnique({
+        where: { username: token?.username as string},
+      });
+
+      if(!existingUser){
+        signOut({
+          redirect: true,
+          callbackUrl: `${window.location.origin}/login`,
+        })
+      }
+
       return {
         ...session,
         user: {

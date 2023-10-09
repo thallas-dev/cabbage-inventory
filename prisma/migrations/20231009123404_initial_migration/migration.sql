@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL,
     "username" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -12,13 +12,13 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Item" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "productName" VARCHAR(255) NOT NULL,
     "quantity" INTEGER NOT NULL,
     "description" VARCHAR(255) NOT NULL,
-    "ownerId" INTEGER NOT NULL,
+    "ownerId" UUID NOT NULL,
 
     CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
 );

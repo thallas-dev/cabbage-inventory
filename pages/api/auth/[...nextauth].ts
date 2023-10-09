@@ -51,18 +51,18 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-      async jwt({ token, user, account }) {
-        if (account) {
-          token.id = user.id;
-        }
-        if (user) {
-          return {
-            ...token,
-            username: user.username,
-          };
-        }
-        return token;
-      },
+    async jwt({ token, user, account }) {
+      if (account) {
+        token.id = user.id;
+      }
+      if (user) {
+        return {
+          ...token,
+          username: user.username,
+        };
+      }
+      return token;
+    },
     async session({ session, token }) {
       const existingUser = await prisma.user.findUnique({
         where: { username: token?.username as string},

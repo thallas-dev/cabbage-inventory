@@ -11,22 +11,61 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  username  String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Item      Item[]
+  id         String       @id @default(uuid()) @db.Uuid
+  username   String       @unique
+  name       String
+  password   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Collection Collection[]
 }
 
 model Item {
-  id          String   @id @default(uuid()) @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  productName String   @db.VarChar(255)
-  quantity    Int
-  description String   @db.VarChar(255)
-  owner       User     @relation(fields: [ownerId], references: [id])
-  ownerId     String   @db.Uuid
+  id           String     @id @default(uuid()) @db.Uuid
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  name         String     @db.VarChar(255)
+  quantity     Int
+  description  String     @db.VarChar(255)
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String     @db.Uuid
+  Tags         Tags[]
+}
+
+model Collection {
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String     @db.VarChar(255)
+  owner     User       @relation(fields: [ownerId], references: [id])
+  ownerId   String     @db.Uuid
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Category  Category[]
+  Item      Item[]
+  Tags      Tags[]
+}
+
+model Category {
+  id           String     @id @default(uuid()) @db.Uuid
+  name         String     @db.VarChar(255)
+  filterBy     String     @db.VarChar(127)
+  startQty     Int
+  endQty       Int
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String     @db.Uuid
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  Tags         Tags[]
+}
+
+model Tags {
+  id           String     @id @default(uuid()) @db.Uuid
+  name         String     @unique @db.VarChar(255)
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String     @db.Uuid
+  category     Category   @relation(fields: [categoryId], references: [id])
+  categoryId   String     @db.Uuid
+  item         Item       @relation(fields: [itemId], references: [id])
+  itemId       String     @db.Uuid
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }

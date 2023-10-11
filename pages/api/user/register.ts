@@ -14,7 +14,7 @@ const UserSchema = z.object({
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method === "POST") {
     // Process a POST request
@@ -33,7 +33,7 @@ export default async function handler(
 
       const encryptedPassword = await hash(
         password,
-        Number(process.env.SALT_ROUND)
+        Number(process.env.SALT_ROUND),
       );
       const newUser = await prisma.user.create({
         data: {

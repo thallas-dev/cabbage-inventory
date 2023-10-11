@@ -55,7 +55,11 @@ export default function Signup() {
     if (response.ok) {
       router.push("/login");
     } else {
-      console.log("Something went wrong.");
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      })
     }
   }
 

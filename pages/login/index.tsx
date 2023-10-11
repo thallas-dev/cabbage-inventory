@@ -49,7 +49,6 @@ export default function Login() {
         title: "Uh oh! Something went wrong.",
         description: "Invalid username or password.",
       })
-      console.log("Test commit for github webhook")
     }
   }
 

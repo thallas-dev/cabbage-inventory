@@ -36,7 +36,7 @@ export default function Items() {
         selected: false,
         qty: 0,
       })
-      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i })),
+      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i }))
   );
   const itemsList: Item[] = Array<Item>(50)
     .fill({
@@ -65,25 +65,24 @@ export default function Items() {
         ? [...itemsList]
         : itemsList
             .filter((item) =>
-              selectedCategories.some((cat) => item.qty <= cat.qty),
+              selectedCategories.some((cat) => item.qty <= cat.qty)
             )
             .sort((a, b) => {
               if (a.qty === 0) return 2;
               if (a.qty > b.qty) return 1;
               if (a.qty < b.qty) return -1;
               return 0;
-            }),
+            })
     );
 
-    console.log({ filteredItemsList });
     setCategoriesList([...categoriesList]);
   };
 
   return (
-    <>
+    <section>
       <h1 className="text-lg font-bold mb-5">Items Display</h1>
       {/* Categories Filter */}
-      <section className="h-full grid grid-cols-5 gap-4">
+      <div className="h-full grid grid-cols-5 gap-4">
         <section className="bg-slate-50 p-3">
           <h3 className="font-semibold mb-2">Categories Filter</h3>
           <ul>
@@ -154,7 +153,7 @@ export default function Items() {
             )}
           </div>
         </section>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

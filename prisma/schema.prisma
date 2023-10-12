@@ -45,6 +45,8 @@ model Collection {
   Category  Category[]
   Item      Item[]
   Tags      Tags[]
+
+  @@unique(fields: [name, ownerId], name: "ownedCollection")
 }
 
 model Category {

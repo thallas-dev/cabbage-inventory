@@ -40,7 +40,7 @@ export default async function handler(
           .json({ collection: newCollection, message: "Collection successfully created" });
       }
     } catch (err) {
-      res.status(500).json({ error: "failed to fetch data" });
+      res.status(500).json({ err, error: "failed to fetch data" });
     }
   } else {
     // Handle any other HTTP method

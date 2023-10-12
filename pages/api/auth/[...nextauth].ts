@@ -44,8 +44,9 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: existingUser.id,
+          id: String(existingUser.id),
           username: existingUser.username,
+          uuid: existingUser.uuid
         };
       },
     }),
@@ -53,6 +54,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (account) {
+        token.uuid = user.uuid;
         token.id = user.id;
       }
       if (user) {
@@ -81,6 +83,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           username: token.username,
           id: token.id,
+          uuid: token.uuid
         },
       };
     },

@@ -11,7 +11,8 @@ datasource db {
 }
 
 model User {
-  id         String       @id @default(uuid()) @db.Uuid
+  id         Int          @id @default(autoincrement())
+  uuid       String       @default(uuid())
   username   String       @unique
   name       String
   password   String
@@ -21,22 +22,24 @@ model User {
 }
 
 model Item {
-  id           String     @id @default(uuid()) @db.Uuid
+  id           Int        @id @default(autoincrement())
+  uuid         String     @default(uuid())
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   name         String     @db.VarChar(255)
   quantity     Int
   description  String     @db.VarChar(255)
   collection   Collection @relation(fields: [collectionId], references: [id])
-  collectionId String     @db.Uuid
+  collectionId Int
   Tags         Tags[]
 }
 
 model Collection {
-  id        String     @id @default(uuid()) @db.Uuid
+  id        Int        @id @default(autoincrement())
+  uuid      String     @default(uuid())
   name      String     @db.VarChar(255)
   owner     User       @relation(fields: [ownerId], references: [id])
-  ownerId   String     @db.Uuid
+  ownerId   Int
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   Category  Category[]
@@ -45,27 +48,29 @@ model Collection {
 }
 
 model Category {
-  id           String     @id @default(uuid()) @db.Uuid
+  id           Int        @id @default(autoincrement())
+  uuid         String     @default(uuid())
   name         String     @db.VarChar(255)
   filterBy     String     @db.VarChar(127)
   startQty     Int
   endQty       Int
   collection   Collection @relation(fields: [collectionId], references: [id])
-  collectionId String     @db.Uuid
+  collectionId Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   Tags         Tags[]
 }
 
 model Tags {
-  id           String     @id @default(uuid()) @db.Uuid
+  id           Int        @id @default(autoincrement())
+  uuid         String     @default(uuid())
   name         String     @unique @db.VarChar(255)
   collection   Collection @relation(fields: [collectionId], references: [id])
-  collectionId String     @db.Uuid
+  collectionId Int
   category     Category   @relation(fields: [categoryId], references: [id])
-  categoryId   String     @db.Uuid
+  categoryId   Int
   item         Item       @relation(fields: [itemId], references: [id])
-  itemId       String     @db.Uuid
+  itemId       Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }

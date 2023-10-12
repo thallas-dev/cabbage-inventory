@@ -22,23 +22,23 @@ export default async function handler(
          name : name, ownerId: ownerId
         },
       });
-    
       if (collectionExist) {
         res
           .status(409)
           .json({ message: "You already own this collection." });
       }
 
-      const newCollection = await prisma.collection.create({
-        data: {
-          name,
-          ownerId
-        },
-      });
-
-      res
-        .status(201)
-        .json({ collection: newCollection, message: "Collection successfully created" });
+      else{
+        const newCollection = await prisma.collection.create({
+          data: {
+            name,
+            ownerId
+          },
+        });
+        res
+          .status(201)
+          .json({ collection: newCollection, message: "Collection successfully created" });
+      }
     } catch (err) {
       res.status(500).json({ error: "failed to fetch data" });
     }

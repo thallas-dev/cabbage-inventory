@@ -12,8 +12,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "POST") {
-    // Process a POST request
+  const ALLOWED_METHODS = ['POST'] as const;
+  if (!ALLOWED_METHODS.includes(req.method as 'POST')) {
+      res.status(405).json({ error: "Invalid method" });
+      return;
+  } 
+
     try {
       const { name, ownerId } = CollectionSchema.parse(req.body);
 
@@ -26,9 +30,9 @@ export default async function handler(
         res
           .status(409)
           .json({ message: "You already own this collection." });
+        return;
       }
 
-      else{
         const newCollection = await prisma.collection.create({
           data: {
             name,
@@ -38,12 +42,8 @@ export default async function handler(
         res
           .status(201)
           .json({ collection: newCollection, message: "Collection successfully created" });
-      }
+
     } catch (err) {
       res.status(500).json({ err, error: "failed to fetch data" });
     }
-  } else {
-    // Handle any other HTTP method
-    res.status(405).json({ error: "Invalid method" });
-  }
 }

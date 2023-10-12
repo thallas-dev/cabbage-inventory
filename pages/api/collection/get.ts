@@ -11,8 +11,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "GET") {
-    // Process a POST request
+  const ALLOWED_METHODS = ['GET'] as const;
+  if (!ALLOWED_METHODS.includes(req.method as 'GET')) {
+      res.status(405).json({ error: "Invalid method" });
+      return;
+  } 
+
     try {
       const { ownerId } = CollectionSchema.parse(req.body);
 
@@ -30,8 +34,4 @@ export default async function handler(
     } catch (err) {
       res.status(500).json({ err, error: "failed to fetch data" });
     }
-  } else {
-    // Handle any other HTTP method
-    res.status(405).json({ error: "Invalid method" });
-  }
 }

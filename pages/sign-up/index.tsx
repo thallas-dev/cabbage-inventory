@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import AppTitle from "@/components/ui/app-title";
+import Link from "next/link";
 
 const FormSchema = z
   .object({
@@ -59,7 +60,7 @@ export default function Signup() {
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
         description: "There was a problem with your request.",
-      })
+      });
     }
   }
 
@@ -136,6 +137,19 @@ export default function Signup() {
             Create account
           </Button>
         </form>
+        <div
+          className="mx-auto my-4 flex w-full items-center justify-evenly
+             before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow
+             after:bg-stone-400"
+        >
+          or
+        </div>
+        <p className="text-center text-sm text-gray-600 mt-2">
+          Already have an account?
+          <Link className="text-link hover:underline ml-1" href="/login">
+            Log in
+          </Link>
+        </p>
       </section>
     </Form>
   );

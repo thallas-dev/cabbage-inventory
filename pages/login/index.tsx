@@ -48,7 +48,7 @@ export default function Login() {
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
         description: "Invalid username or password.",
-      })
+      });
     }
   }
 
@@ -103,9 +103,9 @@ export default function Login() {
           or
         </div>
         <p className="text-center text-sm text-gray-600 mt-2">
-          If you don&apos;t have an account, please&nbsp;
-          <Link className="text-blue-500 hover:underline" href="/sign-up">
-            Create an account
+          Don&apos;t have an account?
+          <Link className="text-link ml-1 hover:underline" href="/sign-up">
+            Create one
           </Link>
         </p>
       </section>

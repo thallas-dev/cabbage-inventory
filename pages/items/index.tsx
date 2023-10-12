@@ -75,15 +75,14 @@ export default function Items() {
             }),
     );
 
-    console.log({ filteredItemsList });
     setCategoriesList([...categoriesList]);
   };
 
   return (
-    <>
+    <section>
       <h1 className="text-lg font-bold mb-5">Items Display</h1>
       {/* Categories Filter */}
-      <section className="h-full grid grid-cols-5 gap-4">
+      <div className="h-full grid grid-cols-5 gap-4">
         <section className="bg-slate-50 p-3">
           <h3 className="font-semibold mb-2">Categories Filter</h3>
           <ul>
@@ -154,7 +153,7 @@ export default function Items() {
             )}
           </div>
         </section>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { hash } from "bcrypt";
 import * as z from "zod";
-import { error } from "console";
 
 const UserSchema = z.object({
   username: z.string().min(5, {
@@ -52,6 +51,6 @@ export default async function handler(
     }
   } else {
     // Handle any other HTTP method
-    res.status(405).json("Invalid method");
+    res.status(405).json({ error: "Invalid method" });
   }
 }

@@ -1,26 +1,36 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-  - You are about to drop the column `ownerId` on the `Item` table. All the data in the column will be lost.
-  - You are about to drop the column `productName` on the `Item` table. All the data in the column will be lost.
-  - Added the required column `collectionId` to the `Item` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `name` to the `Item` table without a default value. This is not possible if the table is not empty.
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
-*/
--- DropForeignKey
-ALTER TABLE "Item" DROP CONSTRAINT "Item_ownerId_fkey";
+-- CreateTable
+CREATE TABLE "Item" (
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "description" VARCHAR(255) NOT NULL,
+    "collectionId" INTEGER NOT NULL,
 
--- AlterTable
-ALTER TABLE "Item" DROP COLUMN "ownerId",
-DROP COLUMN "productName",
-ADD COLUMN     "collectionId" UUID NOT NULL,
-ADD COLUMN     "name" VARCHAR(255) NOT NULL;
+    CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Collection" (
-    "id" UUID NOT NULL,
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
     "name" VARCHAR(255) NOT NULL,
-    "ownerId" UUID NOT NULL,
+    "ownerId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -29,12 +39,13 @@ CREATE TABLE "Collection" (
 
 -- CreateTable
 CREATE TABLE "Category" (
-    "id" UUID NOT NULL,
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "filterBy" VARCHAR(127) NOT NULL,
     "startQty" INTEGER NOT NULL,
     "endQty" INTEGER NOT NULL,
-    "collectionId" UUID NOT NULL,
+    "collectionId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -43,16 +54,20 @@ CREATE TABLE "Category" (
 
 -- CreateTable
 CREATE TABLE "Tags" (
-    "id" UUID NOT NULL,
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
     "name" VARCHAR(255) NOT NULL,
-    "collectionId" UUID NOT NULL,
-    "categoryId" UUID NOT NULL,
-    "itemId" UUID NOT NULL,
+    "collectionId" INTEGER NOT NULL,
+    "categoryId" INTEGER NOT NULL,
+    "itemId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Tags_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Tags_name_key" ON "Tags"("name");

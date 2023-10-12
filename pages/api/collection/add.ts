@@ -5,7 +5,7 @@ import * as z from "zod";
 
 const CollectionSchema = z.object({
   name: z.string(),
-  ownerId: z.string(),
+  ownerId: z.number(),
 });
 
 export default async function handler(
@@ -17,49 +17,30 @@ export default async function handler(
     try {
       const { name, ownerId } = CollectionSchema.parse(req.body);
 
-      // const idExist = await prisma.user.findFirst({
-      //   where: { id: ownerId },
-      // });
-      // res
-      // .status(200)
-      // .json({ name, ownerId });
-
-
-      // console.log(idExist)
-      // if (!idExist){
-      //   res
-      //   .status(409)
-      //   .json({ user: null, message: "UserId you provided does not exist." });
-      // }
-      const collectionExist = await prisma.item.count({
+      const collectionExist = await prisma.collection.count({
         where: {
-         name : name
+         name : name, ownerId: ownerId
         },
       });
-      
+    
+      if (collectionExist) {
+        res
+          .status(409)
+          .json({ message: "You already own this collection." });
+      }
+
+      const newCollection = await prisma.collection.create({
+        data: {
+          name,
+          ownerId
+        },
+      });
+
       res
-        .status(200)
-        .json({ collectionExist });
-
-
-      // if (collectionExist) {
-      //   res
-      //     .status(409)
-      //     .json({ user: null, message: "Collection already exist." });
-      // }
-
-      // const newCollection = await prisma.collection.create({
-      //   data: {
-      //     name,
-      //     ownerId
-      //   },
-      // });
-
-      // res
-      //   .status(201)
-      //   .json({ collection: newCollection, message: "Collection successfully created" });
+        .status(201)
+        .json({ collection: newCollection, message: "Collection successfully created" });
     } catch (err) {
-      res.status(500).json({ err, error: "failed to fetch data" });
+      res.status(500).json({ error: "failed to fetch data" });
     }
   } else {
     // Handle any other HTTP method

@@ -3,8 +3,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
 
 
-const CollectionSchema = z.object({
-  ownerId: z.number(),
+const CategorySchema = z.object({
+  collectionId: z.number(),
 });
 
 export default async function handler(
@@ -18,17 +18,17 @@ export default async function handler(
   } 
 
     try {
-      const { ownerId } = CollectionSchema.parse(req.body);
+      const { collectionId } = CategorySchema.parse(req.body);
 
-      const collection = await prisma.collection.findMany({
+      const category = await prisma.category.findMany({
         where: { 
-          ownerId: ownerId
+          collectionId: collectionId
         },
       });
       
       res
       .status(200)
-      .json({ collection : collection });
+      .json({ category : category });
 
 
     } catch (err) {

@@ -15,7 +15,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method === "POST") {
+  const ALLOWED_METHODS = ['POST'] as const;
+  if (!ALLOWED_METHODS.includes(req.method as 'POST')) {
+      res.status(405).json({ error: "Invalid method" });
+      return;
+  } 
+
     // Process a POST request
     try {
       const { username, name, password } = UserSchema.parse(req.body);
@@ -28,6 +33,7 @@ export default async function handler(
         res
           .status(409)
           .json({ user: null, message: "Username already exists." });
+        return;
       }
 
       const encryptedPassword = await hash(
@@ -49,8 +55,5 @@ export default async function handler(
     } catch (err) {
       res.status(500).json({ error: "failed to fetch data" });
     }
-  } else {
-    // Handle any other HTTP method
-    res.status(405).json({ error: "Invalid method" });
-  }
+
 }

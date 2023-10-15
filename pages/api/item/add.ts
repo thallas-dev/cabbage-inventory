@@ -1,3 +1,4 @@
+import { RequestMethods } from '@/lib/helpers';
 import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
@@ -14,11 +15,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const ALLOWED_METHODS = ['POST'] as const;
-  if (!ALLOWED_METHODS.includes(req.method as 'POST')) {
+  const ALLOWED_METHODS: RequestMethods[] = ['POST'];
+  if (!ALLOWED_METHODS.includes(req.method as RequestMethods)) {
       res.status(405).json({ error: "Invalid method" });
       return;
-  } 
+  }   
 
     try {
       const { name, quantity, description, collectionId } = ItemSchema.parse(req.body);

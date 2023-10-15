@@ -6,6 +6,29 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Badge } from "../../components/ui/badge";
+import { LeafyGreen } from "lucide-react";
+import { Label } from "@radix-ui/react-label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Input } from "../../components/ui/input";
 
 type Category = {
   name: string;
@@ -20,6 +43,12 @@ type Item = {
   unit: string;
   tags: string[];
 };
+
+const AddItemSchema = z.object({
+  name: z.string(),
+});
+
+type AddItemForm = z.infer<typeof AddItemSchema>;
 
 export default function Items() {
   const router = useRouter();
@@ -36,7 +65,7 @@ export default function Items() {
         selected: false,
         qty: 0,
       })
-      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i })),
+      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i }))
   );
   const itemsList: Item[] = Array<Item>(50)
     .fill({
@@ -65,22 +94,73 @@ export default function Items() {
         ? [...itemsList]
         : itemsList
             .filter((item) =>
-              selectedCategories.some((cat) => item.qty <= cat.qty),
+              selectedCategories.some((cat) => item.qty <= cat.qty)
             )
             .sort((a, b) => {
               if (a.qty === 0) return 2;
               if (a.qty > b.qty) return 1;
               if (a.qty < b.qty) return -1;
               return 0;
-            }),
+            })
     );
 
     setCategoriesList([...categoriesList]);
   };
 
+  //TODO: reorganize
+  const form = useForm<AddItemForm>({
+    resolver: zodResolver(AddItemSchema),
+  });
+
   return (
     <section>
-      <h1 className="text-lg font-bold mb-5">Items Display</h1>
+      <div className="flex justify-between mb-2">
+        <h1 className="flex items-end text-lg font-bold m-0">Items Display</h1>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <LeafyGreen
+                color="#99F0CA"
+                strokeWidth={3}
+                size={18}
+                className="inline mr-2"
+              />{" "}
+              Add Item
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Add new item</DialogTitle>
+              <DialogDescription>
+                Need a new item to track? Just fill up the form then press save.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(() => console.log("Hey"))}
+                className="w-full grid gap-y-3"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Item Name:</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter username" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter>
+                  <Button type="submit">Save</Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
       {/* Categories Filter */}
       <div className="h-full grid grid-cols-5 gap-4">
         <section className="bg-slate-50 p-3">

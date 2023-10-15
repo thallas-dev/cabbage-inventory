@@ -15,45 +15,42 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const ALLOWED_METHODS = ['POST'] as const;
-  if (!ALLOWED_METHODS.includes(req.method as 'POST')) {
-      res.status(405).json({ error: "Invalid method" });
+  const ALLOWED_METHODS = ["POST"] as const;
+  if (!ALLOWED_METHODS.includes(req.method as "POST")) {
+    res.status(405).json({ error: "Invalid method" });
+    return;
+  }
+
+  // Process a POST request
+  try {
+    const { username, name, password } = UserSchema.parse(req.body);
+
+    const usernameExist = await prisma.user.findUnique({
+      where: { username: username },
+    });
+    if (usernameExist) {
+      // TODO : standardize handling API response
+      res.status(409).json({ user: null, message: "Username already exists." });
       return;
-  } 
-
-    // Process a POST request
-    try {
-      const { username, name, password } = UserSchema.parse(req.body);
-
-      const usernameExist = await prisma.user.findUnique({
-        where: { username: username },
-      });
-      if (usernameExist) {
-        // TODO : standardize handling API response
-        res
-          .status(409)
-          .json({ user: null, message: "Username already exists." });
-        return;
-      }
-
-      const encryptedPassword = await hash(
-        password,
-        Number(process.env.SALT_ROUND),
-      );
-      const newUser = await prisma.user.create({
-        data: {
-          username,
-          name,
-          password: encryptedPassword,
-        },
-      });
-      const { password: newPassword, ...objWithoutPw } = newUser;
-
-      res
-        .status(201)
-        .json({ user: objWithoutPw, message: "User successfully created" });
-    } catch (err) {
-      res.status(500).json({ error: "failed to fetch data" });
     }
 
+    const encryptedPassword = await hash(
+      password,
+      Number(process.env.SALT_ROUND),
+    );
+    const newUser = await prisma.user.create({
+      data: {
+        username,
+        name,
+        password: encryptedPassword,
+      },
+    });
+    const { password: newPassword, ...objWithoutPw } = newUser;
+
+    res
+      .status(201)
+      .json({ user: objWithoutPw, message: "User successfully created" });
+  } catch (err) {
+    res.status(500).json({ error: "failed to fetch data" });
+  }
 }

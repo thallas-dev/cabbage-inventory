@@ -1,8 +1,8 @@
 import { RequestMethods } from '@/lib/helpers';
 import { prisma } from "@/lib/prisma";
-import { data } from 'autoprefixer';
 import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
+import { updateIfValueExists } from '@/lib/helpers';
 
 
 const CategorySchema = z.object({
@@ -62,8 +62,4 @@ export default async function handler(
     } catch (err) {
       res.status(500).json({ err, error: "failed to fetch data" });
     }
-}
-
-function updateIfValueExists(obj: Record<string, any>, key: string, value: any) {
-  return value ? { ...obj, [key]: value } : obj;
 }

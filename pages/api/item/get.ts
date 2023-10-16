@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
+import { RequestMethods } from '@/lib/helpers';
 
 
 const ItemSchema = z.object({
@@ -11,8 +12,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const ALLOWED_METHODS = ['GET'] as const;
-  if (!ALLOWED_METHODS.includes(req.method as 'GET')) {
+  const ALLOWED_METHODS: RequestMethods[] = ['GET'];
+  if (!ALLOWED_METHODS.includes(req.method as RequestMethods)) {
       res.status(405).json({ error: "Invalid method" });
       return;
   } 

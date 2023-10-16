@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { hash } from "bcrypt";
 import * as z from "zod";
+import { RequestMethods } from '@/lib/helpers';
 
 const UserSchema = z.object({
   username: z.string().min(5, {
@@ -15,8 +16,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const ALLOWED_METHODS = ['POST'] as const;
-  if (!ALLOWED_METHODS.includes(req.method as 'POST')) {
+  const ALLOWED_METHODS: RequestMethods[] = ['POST'];
+  if (!ALLOWED_METHODS.includes(req.method as RequestMethods)) {
       res.status(405).json({ error: "Invalid method" });
       return;
   } 

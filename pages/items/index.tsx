@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Badge } from "../../components/ui/badge";
@@ -33,6 +33,23 @@ export default function Items() {
       router.push("/login");
     }
   }, [session, router]);
+
+  const uploadFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    let file;
+
+    if(e.target.files) {
+      file = e.target.files[0]; 
+    }
+
+    const { data, error } = await supabase.storage.from(process.env.NEXT_PUBLIC_STORAGE_BUCKET_NAME as string).upload(file?.name as string, file as File)
+    if (error) {
+      console.log(error)
+    } else {
+      console.log(data)
+    }
+
+  }
+
   const [categoriesList, setCategoriesList] = useState<Category[]>(
     Array(15)
       .fill({
@@ -89,7 +106,7 @@ export default function Items() {
       <div className="h-full grid grid-cols-5 gap-4">
         <section className="bg-slate-50 p-3">
         <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Input id="picture" type="file" />
+        <Input id="picture" type="file" onChange={(e) => {uploadFile(e)}}/>
         </div>
           <h3 className="font-semibold mb-2">Categories Filter</h3>
           <ul>

@@ -65,7 +65,7 @@ export default function Items() {
         selected: false,
         qty: 0,
       })
-      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i }))
+      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i })),
   );
   const itemsList: Item[] = Array<Item>(50)
     .fill({
@@ -94,14 +94,14 @@ export default function Items() {
         ? [...itemsList]
         : itemsList
             .filter((item) =>
-              selectedCategories.some((cat) => item.qty <= cat.qty)
+              selectedCategories.some((cat) => item.qty <= cat.qty),
             )
             .sort((a, b) => {
               if (a.qty === 0) return 2;
               if (a.qty > b.qty) return 1;
               if (a.qty < b.qty) return -1;
               return 0;
-            })
+            }),
     );
 
     setCategoriesList([...categoriesList]);

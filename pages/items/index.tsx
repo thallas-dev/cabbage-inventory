@@ -24,11 +24,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../components/ui/form";
+} from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Input } from "../../components/ui/input";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Category = {
   name: string;
@@ -36,19 +38,17 @@ type Category = {
   qty: number;
 };
 
-type Item = {
-  name: string;
-  description: string;
-  qty: number;
-  unit: string;
-  tags: string[];
-};
-
-const AddItemSchema = z.object({
+const ItemSchema = z.object({
   name: z.string(),
+  description: z.string(),
+  quantity: z.number(),
+  unit: z.string(),
+  tags: z.array(z.string()),
+  collectionId: z.number(),
 });
 
-type AddItemForm = z.infer<typeof AddItemSchema>;
+type Item = z.infer<typeof ItemSchema>;
+type AddItemForm = z.infer<typeof ItemSchema>;
 
 export default function Items() {
   const router = useRouter();
@@ -65,18 +65,21 @@ export default function Items() {
         selected: false,
         qty: 0,
       })
-      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i })),
+      .map((cat, i) => ({ ...cat, name: `${cat.name} ${i + 1}`, qty: i }))
   );
+  //TODO: fetch with real data
   const itemsList: Item[] = Array<Item>(50)
     .fill({
       name: "My Item",
       description: "The Item Description is a very important part of an item",
-      qty: 5,
+      quantity: 5,
       unit: "pcs.",
       tags: ["Tag 1", "Tag 2", "Tag 2", "Tag 2", "Tag 2"],
+      collectionId: 1,
     })
     .map((item, i) => {
       const qty = Math.max(0, i % 2 === 0 ? 5 + i : 10 - i);
+
       return {
         ...item,
         qty,
@@ -94,14 +97,14 @@ export default function Items() {
         ? [...itemsList]
         : itemsList
             .filter((item) =>
-              selectedCategories.some((cat) => item.qty <= cat.qty),
+              selectedCategories.some((cat) => item.quantity <= cat.qty)
             )
             .sort((a, b) => {
-              if (a.qty === 0) return 2;
-              if (a.qty > b.qty) return 1;
-              if (a.qty < b.qty) return -1;
+              if (a.quantity === 0) return 2;
+              if (a.quantity > b.quantity) return 1;
+              if (a.quantity < b.quantity) return -1;
               return 0;
-            }),
+            })
     );
 
     setCategoriesList([...categoriesList]);
@@ -109,8 +112,9 @@ export default function Items() {
 
   //TODO: reorganize
   const form = useForm<AddItemForm>({
-    resolver: zodResolver(AddItemSchema),
+    resolver: zodResolver(ItemSchema),
   });
+  const [itemPreview, setItemPreview] = useState("");
 
   return (
     <section>
@@ -135,6 +139,20 @@ export default function Items() {
                 Need a new item to track? Just fill up the form then press save.
               </DialogDescription>
             </DialogHeader>
+            <div className="text-center">
+              <Image
+                src={"/image-preview.svg"}
+                height={0}
+                width={0}
+                style={{ width: "100%", height: "auto" }}
+                alt={"image preview"}
+                onClick={() => console.log("The image has been clicked")}
+              />
+              <p className="text-xs text-gray-400">
+                Click to upload or drop an image.
+              </p>
+            </div>
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(() => console.log("Hey"))}
@@ -145,9 +163,22 @@ export default function Items() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Item Name:</FormLabel>
+                      <FormLabel>Name:</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter username" {...field} />
+                        <Input placeholder="What to call the item" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description:</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Description of the item"></Textarea>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -195,22 +226,22 @@ export default function Items() {
                   />
                   <h5 className="px-2 mt-2">
                     {item.name}
-                    {item.qty === 0 ? (
+                    {item.quantity === 0 ? (
                       <span className="ml-2 text-red-500 text-xs font-semibold">
                         Out of Stock
                       </span>
                     ) : (
                       <span
                         className={`ml-2 ${
-                          item.qty > 5 ? "text-slate-600" : "text-red-500"
+                          item.quantity > 5 ? "text-slate-600" : "text-red-500"
                         } text-xs`}
                       >
-                        {item.qty}
+                        {item.quantity}
                         {item.unit}
                       </span>
                     )}
 
-                    {item.qty > 0 && item.qty <= 5 && (
+                    {item.quantity > 0 && item.quantity <= 5 && (
                       <span className="ml-1 text-red-500 text-xs">left</span>
                     )}
                   </h5>

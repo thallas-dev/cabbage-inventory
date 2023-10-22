@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: String(existingUser.id),
           username: existingUser.username,
-          uuid: existingUser.uuid
+          uuid: existingUser.uuid,
         };
       },
     }),
@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           username: token.username,
           id: token.id,
-          uuid: token.uuid
+          uuid: token.uuid,
         },
       };
     },

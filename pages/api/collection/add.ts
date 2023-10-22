@@ -1,8 +1,7 @@
-import { RequestMethods } from '@/lib/helpers';
+import { RequestMethods } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
-
 
 const CollectionSchema = z.object({
   name: z.string(),
@@ -11,40 +10,41 @@ const CollectionSchema = z.object({
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  const ALLOWED_METHODS: RequestMethods[] = ['POST'];
+  const ALLOWED_METHODS: RequestMethods[] = ["POST"];
   if (!ALLOWED_METHODS.includes(req.method as RequestMethods)) {
-      res.status(405).json({ error: "Invalid method" });
+    res.status(405).json({ error: "Invalid method" });
+    return;
+  }
+
+  try {
+    const { name, ownerId } = CollectionSchema.parse(req.body);
+
+    const collectionExist = await prisma.collection.count({
+      where: {
+        name: name,
+        ownerId: ownerId,
+      },
+    });
+    if (collectionExist) {
+      res.status(409).json({ message: "You already own this collection." });
       return;
-  } 
-
-    try {
-      const { name, ownerId } = CollectionSchema.parse(req.body);
-
-      const collectionExist = await prisma.collection.count({
-        where: {
-         name : name, ownerId: ownerId
-        },
-      });
-      if (collectionExist) {
-        res
-          .status(409)
-          .json({ message: "You already own this collection." });
-        return;
-      }
-
-        const newCollection = await prisma.collection.create({
-          data: {
-            name,
-            ownerId
-          },
-        });
-        res
-          .status(201)
-          .json({ collection: newCollection, message: "Collection successfully created" });
-
-    } catch (err) {
-      res.status(500).json({ err, error: "failed to fetch data" });
     }
+
+    const newCollection = await prisma.collection.create({
+      data: {
+        name,
+        ownerId,
+      },
+    });
+    res
+      .status(201)
+      .json({
+        collection: newCollection,
+        message: "Collection successfully created",
+      });
+  } catch (err) {
+    res.status(500).json({ err, error: "failed to fetch data" });
+  }
 }

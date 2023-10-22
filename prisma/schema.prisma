@@ -22,16 +22,17 @@ model User {
 }
 
 model Item {
-  id           Int        @id @default(autoincrement())
-  uuid         String     @default(uuid())
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  name         String     @db.VarChar(255)
+  id           Int           @id @default(autoincrement())
+  uuid         String        @default(uuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String        @db.VarChar(255)
   quantity     Int
-  description  String     @db.VarChar(255)
-  collection   Collection @relation(fields: [collectionId], references: [id])
+  description  String        @db.VarChar(255)
+  collection   Collection    @relation(fields: [collectionId], references: [id])
   collectionId Int
   Tags         Tags[]
+  ItemHistory  ItemHistory[]
 }
 
 model Collection {
@@ -75,4 +76,12 @@ model Tags {
   itemId       Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+}
+
+model ItemHistory {
+  id        Int      @id @default(autoincrement())
+  changes   Json
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    Int
+  createdAt DateTime @default(now())
 }

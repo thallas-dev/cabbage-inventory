@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Badge } from "../../components/ui/badge";
@@ -51,6 +51,7 @@ type Item = z.infer<typeof ItemSchema>;
 type AddItemForm = z.infer<typeof ItemSchema>;
 const supabase = supabaseClient;
 
+// TODO: refactor these
 export default function Items() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -59,23 +60,6 @@ export default function Items() {
       router.push("/login");
     }
   }, [session, router]);
-
-  const uploadFile = async (e: ChangeEvent<HTMLInputElement>) => {
-    let file;
-
-    if (e.target.files) {
-      file = e.target.files[0];
-    }
-
-    const { data, error } = await supabase.storage
-      .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET_NAME as string)
-      .upload(file?.name as string, file as File);
-    if (error) {
-      console.log(error);
-    } else {
-      console.log(data);
-    }
-  };
 
   const [categoriesList, setCategoriesList] = useState<Category[]>(
     Array(15)
@@ -129,11 +113,45 @@ export default function Items() {
     setCategoriesList([...categoriesList]);
   };
 
+  const defaultImagePreview = "/image-preview.svg";
   //TODO: reorganize
   const form = useForm<AddItemForm>({
     resolver: zodResolver(ItemSchema),
   });
-  const [itemPreview, setItemPreview] = useState("");
+  const [itemPreviewUrl, setItemPreviewUrl] = useState(defaultImagePreview);
+
+  const hiddenUploadInputRef = useRef<HTMLInputElement>(null);
+  const handleAddItemImageClick = () => {
+    hiddenUploadInputRef.current?.click();
+  };
+
+  const uploadFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const uploadedFiles: FileList | null = e.target.files;
+    //TODO: add file limit
+    if (!uploadedFiles || uploadedFiles.length <= 0) {
+      //TODO: convert to toast
+      console.error("AddItemImageUpload: Invalid upload, seems to be empty!");
+      return;
+    }
+
+    const uploadedImage = uploadedFiles[0];
+    const imageBlobUrl = URL.createObjectURL(uploadedImage);
+    console.log("Hey! uploaded!");
+    console.log({
+      uploadedImage,
+      imagePreviewUrl: imageBlobUrl,
+    });
+    setItemPreviewUrl(imageBlobUrl);
+
+    // const { data, error } = await supabase.storage
+    //   .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET_NAME as string)
+    //   .upload(uploadedImage.name, uploadedImage);
+    // if (error) {
+    //   console.log(error);
+    // } else {
+    //   console.log(data);
+    // }
+  };
 
   return (
     <section>
@@ -160,16 +178,29 @@ export default function Items() {
             </DialogHeader>
             <div className="text-center">
               <Image
-                src={"/image-preview.svg"}
+                className="rounded-md"
+                src={itemPreviewUrl}
                 height={0}
                 width={0}
                 style={{ width: "100%", height: "auto" }}
                 alt={"image preview"}
-                onClick={() => console.log("The image has been clicked")}
+                onClick={handleAddItemImageClick}
               />
-              <p className="text-xs text-gray-400">
-                Click to upload or drop an image.
-              </p>
+              {itemPreviewUrl === defaultImagePreview && (
+                <p className="text-xs text-gray-400">
+                  Click to upload or drop an image.
+                </p>
+              )}
+              <Input
+                ref={hiddenUploadInputRef}
+                id="addItemPicture"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  uploadFile(e);
+                }}
+              />
             </div>
 
             <Form {...form}>
@@ -214,15 +245,6 @@ export default function Items() {
       {/* Categories Filter */}
       <div className="h-full grid grid-cols-5 gap-4">
         <section className="bg-slate-50 p-3">
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Input
-              id="picture"
-              type="file"
-              onChange={(e) => {
-                uploadFile(e);
-              }}
-            />
-          </div>
           <h3 className="font-semibold mb-2">Categories Filter</h3>
           <ul>
             {categoriesList.map((category, i) => (

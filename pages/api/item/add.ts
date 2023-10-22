@@ -1,6 +1,5 @@
 import { RequestMethods } from '@/lib/helpers';
 import { prisma } from "@/lib/prisma";
-import { Prisma } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
 

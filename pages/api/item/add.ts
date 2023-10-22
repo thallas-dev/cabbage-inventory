@@ -1,5 +1,6 @@
 import { RequestMethods } from '@/lib/helpers';
 import { prisma } from "@/lib/prisma";
+import { Prisma } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
 
@@ -56,9 +57,24 @@ export default async function handler(
             collectionId
           },
         });
-        res
+
+        if(newItem){
+          const jsonChanges = {
+            name : name,
+            quantity : quantity,
+            description : description
+          }
+          const itemHistory = await prisma.itemHistory.create({
+            data : {
+              changes : jsonChanges,
+              itemId : newItem.id
+            }
+          })
+          res
           .status(201)
-          .json({ item: newItem, message: "Item successfully created" });
+          .json({ item: newItem, itemHistory: itemHistory, message: "Item successfully created" });
+        }
+
 
     } catch (err) {
       res.status(500).json({ err, error: "failed to fetch data" });

@@ -1,9 +1,8 @@
-import { RequestMethods } from '@/lib/helpers';
+import { RequestMethods } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import * as z from "zod";
-import { updateIfValueExists } from '@/lib/helpers';
-
+import { updateIfValueExists } from "@/lib/helpers";
 
 const ItemSchema = z.object({
   oldItemName: z.string(),
@@ -15,44 +14,46 @@ const ItemSchema = z.object({
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  const ALLOWED_METHODS: RequestMethods[] = ['POST'];
+  const ALLOWED_METHODS: RequestMethods[] = ["POST"];
   if (!ALLOWED_METHODS.includes(req.method as RequestMethods)) {
-      res.status(405).json({ error: "Invalid method" });
+    res.status(405).json({ error: "Invalid method" });
+    return;
+  }
+
+  // Process a POST request
+  try {
+    const { oldItemName, newItemName, quantity, description, collectionId } =
+      ItemSchema.parse(req.body);
+
+    const itemExist = await prisma.item.count({
+      where: {
+        name: oldItemName,
+        collectionId: collectionId,
+      },
+    });
+    if (!itemExist) {
+      res
+        .status(409)
+        .json({ message: "Item does not exist in the collection." });
       return;
-  } 
-  
-    // Process a POST request
-    try {
-      const { oldItemName, newItemName, quantity, description, collectionId } = ItemSchema.parse(req.body);
+    }
 
-      const itemExist = await prisma.item.count({
-        where: {
-         name : oldItemName, collectionId: collectionId
-        },
-      });
-      if (!itemExist) {
-        res
-          .status(409)
-          .json({ message: "Item does not exist in the collection." });
-        return;
-      }
+    let itemUpdate = {};
+    itemUpdate = updateIfValueExists(itemUpdate, "name", newItemName);
+    itemUpdate = updateIfValueExists(itemUpdate, "quantity", quantity);
+    itemUpdate = updateIfValueExists(itemUpdate, "description", description);
 
-      let itemUpdate = {};
-      itemUpdate = updateIfValueExists(itemUpdate, 'name', newItemName);
-      itemUpdate = updateIfValueExists(itemUpdate, 'quantity', quantity);
-      itemUpdate = updateIfValueExists(itemUpdate, 'description', description);
-
-      const updateItem = await prisma.item.updateMany({
-        where: {
-          name: oldItemName,
-          collectionId: collectionId
-        },
-        data: {
-          ...itemUpdate
-        },
-      })
+    const updateItem = await prisma.item.updateMany({
+      where: {
+        name: oldItemName,
+        collectionId: collectionId,
+      },
+      data: {
+        ...itemUpdate,
+      },
+    });
 
       if(updateItem) {
         const itemName = newItemName ? newItemName : oldItemName

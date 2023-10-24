@@ -48,18 +48,34 @@ export default async function handler(
       return;
     }
 
-    const newItem = await prisma.item.create({
-      data: {
-        name,
-        quantity,
-        description,
-        collectionId,
-      },
-    });
-    res
-      .status(201)
-      .json({ item: newItem, message: "Item successfully created" });
-  } catch (err) {
-    res.status(500).json({ err, error: "failed to fetch data" });
-  }
+        const newItem = await prisma.item.create({
+          data: {
+            name,
+            quantity,
+            description,
+            collectionId
+          },
+        });
+
+        if(newItem){
+          const jsonChanges = {
+            name : name,
+            quantity : quantity,
+            description : description
+          }
+          const itemHistory = await prisma.itemHistory.create({
+            data : {
+              changes : jsonChanges,
+              itemId : newItem.id
+            }
+          })
+          res
+          .status(201)
+          .json({ item: newItem, itemHistory: itemHistory, message: "Item successfully created" });
+        }
+
+
+    } catch (err) {
+      res.status(500).json({ err, error: "failed to fetch data" });
+    }
 }

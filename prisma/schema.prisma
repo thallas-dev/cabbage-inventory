@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -22,31 +19,32 @@ model User {
 }
 
 model Item {
-  id           Int        @id @default(autoincrement())
-  uuid         String     @default(uuid())
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  name         String     @db.VarChar(255)
+  id           Int           @id @default(autoincrement())
+  uuid         String        @default(uuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String        @db.VarChar(255)
   quantity     Int
-  description  String     @db.VarChar(255)
-  collection   Collection @relation(fields: [collectionId], references: [id])
+  description  String        @db.VarChar(255)
   collectionId Int
+  collection   Collection    @relation(fields: [collectionId], references: [id])
   Tags         Tags[]
+  ItemHistory  ItemHistory[]
 }
 
 model Collection {
   id        Int        @id @default(autoincrement())
   uuid      String     @default(uuid())
   name      String     @db.VarChar(255)
-  owner     User       @relation(fields: [ownerId], references: [id])
   ownerId   Int
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   Category  Category[]
+  owner     User       @relation(fields: [ownerId], references: [id])
   Item      Item[]
   Tags      Tags[]
 
-  @@unique(fields: [name, ownerId], name: "ownedCollection")
+  @@unique([name, ownerId], name: "ownedCollection")
 }
 
 model Category {
@@ -56,10 +54,10 @@ model Category {
   filterBy     String     @db.VarChar(127)
   startQty     Int
   endQty       Int
-  collection   Collection @relation(fields: [collectionId], references: [id])
   collectionId Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  collection   Collection @relation(fields: [collectionId], references: [id])
   Tags         Tags[]
 }
 
@@ -67,12 +65,20 @@ model Tags {
   id           Int        @id @default(autoincrement())
   uuid         String     @default(uuid())
   name         String     @unique @db.VarChar(255)
-  collection   Collection @relation(fields: [collectionId], references: [id])
   collectionId Int
-  category     Category   @relation(fields: [categoryId], references: [id])
   categoryId   Int
-  item         Item       @relation(fields: [itemId], references: [id])
   itemId       Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  category     Category   @relation(fields: [categoryId], references: [id])
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  item         Item       @relation(fields: [itemId], references: [id])
+}
+
+model ItemHistory {
+  id        Int      @id @default(autoincrement())
+  changes   Json?
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    Int
+  createdAt DateTime @default(now())
 }

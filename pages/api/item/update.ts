@@ -55,10 +55,26 @@ export default async function handler(
       },
     });
 
-    res
-      .status(200)
-      .json({ category: updateItem, message: "Item successfully updated." });
-  } catch (err) {
-    res.status(500).json({ err, error: "failed to fetch data" });
-  }
+      if(updateItem) {
+        const itemName = newItemName ? newItemName : oldItemName
+        const item = await prisma.item.findMany({
+          where: {
+            name: itemName,
+            collectionId: collectionId
+          },
+        })
+        const itemHistory = await prisma.itemHistory.create({
+          data : {
+            changes: itemUpdate,
+            itemId: item[0].id
+          }
+        })
+        res
+        .status(200)
+        .json({ category: updateItem, itemHistory: itemHistory, message: "Item successfully updated." });
+      }
+
+    } catch (err) {
+      res.status(500).json({ err, error: "failed to fetch data" });
+    }
 }

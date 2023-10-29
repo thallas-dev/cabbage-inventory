@@ -41,8 +41,8 @@ type Category = {
 const ItemSchema = z.object({
   name: z.string(),
   description: z.string(),
-  quantity: z.number(),
-  unit: z.string(),
+  quantity: z.coerce.number(),
+  unit: z.string().optional(),
   tags: z.array(z.string()),
   collectionId: z.number(),
 });
@@ -153,10 +153,12 @@ export default function Items() {
     // }
   };
 
-  const [amount, setAmount] = useState(1)
+  async function onSubmit(data: z.infer<typeof ItemSchema>) {
+    console.log("test")
+    
+    console.log(data);
 
-  function handleQuantity(arg0: number): void {
-    throw new Error('Function not implemented.');
+    
   }
 
   return (
@@ -211,7 +213,8 @@ export default function Items() {
 
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(() => console.log("Hey"))}
+                id="hook-form"
+                onSubmit={form.handleSubmit(onSubmit)}
                 className="w-full grid gap-y-3"
               >
                 <FormField
@@ -247,14 +250,14 @@ export default function Items() {
                     <FormItem>
                       <FormLabel>Description:</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Description of the item"></Textarea>
+                        <Textarea placeholder="Description of the item" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Save</Button>
+                  <Button type="submit" form="hook-form">Save</Button>
                 </DialogFooter>
               </form>
             </Form>

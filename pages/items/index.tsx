@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Badge } from "../../components/ui/badge";
 import { LeafyGreen } from "lucide-react";
-import { Label } from "@radix-ui/react-label";
+
 import {
   Dialog,
   DialogContent,
@@ -153,6 +153,12 @@ export default function Items() {
     // }
   };
 
+  const [amount, setAmount] = useState(1)
+
+  function handleQuantity(arg0: number): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <section>
       <div className="flex justify-between mb-2">
@@ -169,7 +175,7 @@ export default function Items() {
               Add Item
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="overflow-y-scroll max-h-screen sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Add new item</DialogTitle>
               <DialogDescription>
@@ -216,6 +222,19 @@ export default function Items() {
                       <FormLabel>Name:</FormLabel>
                       <FormControl>
                         <Input placeholder="What to call the item" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantity:</FormLabel>
+                      <FormControl>
+                        <Input type='number' min={1} inputMode='numeric' placeholder="Quantity of the item" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

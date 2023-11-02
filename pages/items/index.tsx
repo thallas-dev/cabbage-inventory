@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Badge } from "../../components/ui/badge";
 import { LeafyGreen } from "lucide-react";
-import { Label } from "@radix-ui/react-label";
+
 import {
   Dialog,
   DialogContent,
@@ -41,8 +41,8 @@ type Category = {
 const ItemSchema = z.object({
   name: z.string(),
   description: z.string(),
-  quantity: z.number(),
-  unit: z.string(),
+  quantity: z.coerce.number(),
+  unit: z.string().optional(),
   tags: z.array(z.string()),
   collectionId: z.number(),
 });
@@ -153,6 +153,14 @@ export default function Items() {
     // }
   };
 
+  async function onSubmit(data: z.infer<typeof ItemSchema>) {
+    console.log("test")
+    
+    console.log(data);
+
+    
+  }
+
   return (
     <section>
       <div className="flex justify-between mb-2">
@@ -169,7 +177,7 @@ export default function Items() {
               Add Item
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="overflow-y-scroll max-h-screen sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Add new item</DialogTitle>
               <DialogDescription>
@@ -205,7 +213,8 @@ export default function Items() {
 
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(() => console.log("Hey"))}
+                id="hook-form"
+                onSubmit={form.handleSubmit(onSubmit)}
                 className="w-full grid gap-y-3"
               >
                 <FormField
@@ -223,19 +232,32 @@ export default function Items() {
                 />
                 <FormField
                   control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantity:</FormLabel>
+                      <FormControl>
+                        <Input type='number' min={1} inputMode='numeric' placeholder="Quantity of the item" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Description:</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Description of the item"></Textarea>
+                        <Textarea placeholder="Description of the item" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Save</Button>
+                  <Button type="submit" form="hook-form">Save</Button>
                 </DialogFooter>
               </form>
             </Form>
